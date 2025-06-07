@@ -334,6 +334,7 @@ UPDATES_CSS = {
     "appeal-nov24-style": ["less/appeals/nov24.less"],
     "appeal-dec24-style": ["less/appeals/dec24.less"],
     "appeal-apr25-style": ["less/appeals/apr25.less"],
+    "monthly-style": ["less/monthly.less"],
 }
 
 UPDATES_JS = {
