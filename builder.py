@@ -29,7 +29,7 @@ SimpleHTTPServer = http.server.HTTPServer
 SimpleHTTPRequestHandler = http.server.SimpleHTTPRequestHandler
 
 from dateutil.parser import parse
-from jinja2 import Environment, FileSystemLoader, ChoiceLoader, PrefixLoader
+from jinja2 import Environment, FileSystemLoader
 from libs.thunderbird_notes import releasenotes
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
@@ -179,14 +179,7 @@ class Site(object):
 
     def _setup_env(self):
         """Setup the Jinja2 environment, loader, extensions, and filters."""
-        if self.searchpath == settings.UPDATES_PATH:
-            includes_path = os.path.join(settings.WEBSITE_PATH, 'includes')
-            load = ChoiceLoader([
-                FileSystemLoader(self.searchpath),
-                PrefixLoader({'includes': FileSystemLoader(includes_path)}),
-            ])
-        else:
-            load = FileSystemLoader(self.searchpath)
+        load = FileSystemLoader(self.searchpath)
         self._env = Environment(loader=load, extensions=extensions)
         self._env.filters["markdown"] = helper.safe_markdown
         self._env.filters["f"] = helper.f

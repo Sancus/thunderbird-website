@@ -301,6 +301,7 @@ WEBSITE_CSS = {
     'base-style': ['less/base-style.less'],
     'whatsnew-128': ['less/whatsnew-128.less'],
     'appeal-128': ['less/appeal-128.less'],
+    'monthly-style': ['less/monthly.less'],
 }
 
 WEBSITE_JS = {
