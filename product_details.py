@@ -215,7 +215,7 @@ class ThunderbirdDetails():
         - 115 releases are patched up to be ESR builds, non-esr builds post 115 are ignored.
         - 128.0esr has changed from esr to major, but list of majors has no 128 entry.
         """
-        releases = {}
+        releases = []
 
         def needs_major_fixup(version_ints: list[int]):
             """38 started with a point release, so uhhh fix that."""
@@ -278,29 +278,35 @@ class ThunderbirdDetails():
 
         for release in major_versions:
             major_version = float(release[1][0])
-            # The version numbering scheme of Thunderbird has changed over the years,
-            # so there is some trickiness on major versions below 5.
-            # When updating this sorting, be careful old versions aren't broken.
             if major_version < 5:
                 major_pattern = release[0] + '.'
             else:
                 major_pattern = release[0].split('.')[0] + '.'
 
-            # Reparse the float. Fixes 1.5 releases being merged in with 1.0...
             major_version = float(f"{major_pattern.strip('.')}")
 
-            releases[major_version] = {
+            minors = sorted([
+                x for x in minor_versions if x[0].startswith(major_pattern)
+            ], key=lambda x: [int(y) for y in x[1]])
+
+            entry = {
                 'major': release[0],
-                'minor': sorted([x for x in minor_versions
-                                 if x[0].startswith(major_pattern)],
-                                 key=lambda x: [int(y) for y in x[1]])
+                'minor': [x[0] for x in minors],
+                'channel': 'esr' if release[0].endswith('esr') else 'release'
             }
 
-            # We returned a tuple, so we could sort properly.
-            # Now remake that list and select the string from the tuple.
-            releases[major_version]['minor'] = list(map(lambda x: x[0], releases[major_version]['minor']))
+            releases.append((major_version, entry))
 
-        return sorted(releases.items(), reverse=True)
+        releases.sort(key=lambda x: (x[0], x[1]['channel'] == 'esr'), reverse=True)
+        return releases
+
+    def list_beta_versions(self):
+        """Return a list of beta versions sorted newest first."""
+
+        beta_dir = os.path.join(os.path.dirname(__file__), 'thunderbird_notes', 'beta')
+        beta_versions = [f[:-4] for f in os.listdir(beta_dir) if f.endswith('.yml')]
+        beta_versions.sort(key=lambda v: [int(x) for x in re.sub(r'beta.*', '', v).split('.')], reverse=True)
+        return beta_versions
 
     def beta_version_to_canonical(self, version):
         last = ''

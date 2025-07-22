@@ -91,6 +91,7 @@ else:
                'full_builds_beta': helper.thunderbird_desktop.get_filtered_full_builds('beta', beta_version),
                'channel_label': 'Thunderbird',
                'releases': helper.thunderbird_desktop.list_releases(),
+               'beta_versions': helper.thunderbird_desktop.list_beta_versions(),
                'calendars': caldata['calendars'],
                'letters': caldata['letters'],
                'CALDATA_URL': settings.CALDATA_URL,

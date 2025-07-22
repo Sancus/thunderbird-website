@@ -12,28 +12,43 @@
 {% endblock %}
 {% block content %}
 <section>
-  <div class="container no-gap">
-    <div class="section-text two-columns">
-      <div>
-      <p>{{ _('Thunderbird release notes are specific to each version of the application. Select your version from the list below to see the release notes for it.') }}</p>
+  <div class="container no-gap tabs">
+    <input type="radio" name="release-tabs" id="release" checked>
+    <input type="radio" name="release-tabs" id="esr">
+    <input type="radio" name="release-tabs" id="beta">
+
+    <aside>
+      <nav>
+        <ul class="tabs-nav">
+          <li class="release"><label for="release">{{ _('Release') }}</label></li>
+          <li class="esr"><label for="esr">{{ _('ESR') }}</label></li>
+          <li class="beta"><label for="beta">{{ _('Beta') }}</label></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <section class="tab release">
+      <div class="section-text two-columns">
+        <div>
+        <p>{{ _('Thunderbird release notes are specific to each version of the application. Select your version from the list below to see the release notes for it.') }}</p>
+        </div>
+        <div class="atom-feed">
+          <a href="{{ url('thunderbird.releases.atom') }}" title="{{ _('Thunderbird Release Notes Atom Feed') }}">
+            {{ svg('rss') }}
+          </a>
+        </div>
       </div>
-      <div class="atom-feed">
-        <a href="{{ url('thunderbird.releases.atom') }}" title="{{ _('Thunderbird Release Notes Atom Feed') }}">
-          {{ svg('rss') }}
-        </a>
-      </div>
-    </div>
-    <div class="section-text release-list">
-        {% for int_version, versions in releases -%}
+      <div class="section-text release-list">
+        {% for int_version, versions in releases if versions.channel == 'release' -%}
           <div class="release-container">
             <h2 class="release-major txt-gradient">
-              {{ get_link(int_version, versions.major) }}
+              {{ get_link(int_version|float, versions.major) }}
             </h2>
             {% if versions.minor -%}
             <div class="release-minors">
               <ul aria-label="{{ _('Stability releases for version %(version)s'|format(version=versions.major)) }}">
               {% for version in versions.minor -%}
-                <li>{{ get_link(int_version, version, true) }}</li>
+                <li>{{ get_link(int_version|float, version, true) }}</li>
               {% endfor -%}
               </ul>
             </div>
@@ -59,6 +74,43 @@
           </div>
         </div>
       </div>
+    </section>
+
+    <section class="tab esr">
+      <div class="section-text release-list">
+        {% for int_version, versions in releases if versions.channel == 'esr' -%}
+          <div class="release-container">
+            <h2 class="release-major txt-gradient">
+              {{ get_link(int_version|float, versions.major) }}
+            </h2>
+            {% if versions.minor -%}
+            <div class="release-minors">
+              <ul aria-label="{{ _('Stability releases for version %(version)s'|format(version=versions.major)) }}">
+              {% for version in versions.minor -%}
+                <li>{{ get_link(int_version|float, version, true) }}</li>
+              {% endfor -%}
+              </ul>
+            </div>
+            {% endif -%}
+          </div>
+        {% endfor -%}
+      </div>
+    </section>
+
+    <section class="tab beta">
+      <div class="section-text release-list">
+        <div class="release-container">
+          <div class="release-minors">
+            <ul aria-label="{{ _('Beta releases') }}">
+            {% for version in beta_versions -%}
+              {% set int_version = version.split('.')[0]|float %}
+              <li>{{ get_link(int_version, version, true) }}</li>
+            {% endfor -%}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
 
   </div>
 </section>
@@ -97,3 +149,4 @@
     <a href="../../../en-US/thunderbird/{{ version }}/releasenotes/" class="inline-link text-blue-dark font-bold no-underline{{ class }}">{{ version }}</a>
   {%- endif -%}
 {% endmacro %}
+

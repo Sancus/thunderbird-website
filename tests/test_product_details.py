@@ -18,7 +18,13 @@ class TestListReleases:
         with open(os.path.join(fixtures_path, 'thunderbird.json'), 'r') as fh:
             thunderbird_desktop.releases = json.loads(fh.read())
 
-        list_releases_result = dict(thunderbird_desktop.list_releases())
+        list_releases_result = {
+            k: {
+                'major': v['major'],
+                'minor': v['minor']
+            }
+            for k, v in thunderbird_desktop.list_releases()
+        }
 
         # 128.0 wasn't in thunderbird_history_major/stability_releases.json, so it's not included here
         assert 128.0 not in list_releases_old_result
@@ -43,7 +49,22 @@ class TestListReleases:
         with open(os.path.join(fixtures_path, 'thunderbird.json'), 'r') as fh:
             thunderbird_desktop.releases = json.loads(fh.read())
 
-        list_releases_result = dict(thunderbird_desktop.list_releases())
+        list_releases_result = {
+            k: v for k, v in thunderbird_desktop.list_releases()
+        }
 
         assert 128.0 in list_releases_result
         assert '128.0.1esr' in list_releases_result[128.0]['minor']
+
+    def test_release_and_esr_versions_coexist(self):
+        """Major and ESR releases with the same base version should both exist."""
+
+        with open('libs/product-details/public/1.0/thunderbird.json', 'r') as fh:
+            thunderbird_desktop.releases = json.loads(fh.read())
+
+        releases = thunderbird_desktop.list_releases()
+        release_majors = [v['major'] for _, v in releases if v['channel'] == 'release']
+        esr_majors = [v['major'] for _, v in releases if v['channel'] == 'esr']
+
+        assert '140.0' in release_majors
+        assert '140.0esr' in esr_majors
