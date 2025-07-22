@@ -9,6 +9,7 @@
 }
 
 #release:checked ~ section.tab.release,
+#esr:checked ~ section.tab.esr,
 #beta:checked ~ section.tab.beta,
 #daily:checked ~ section.tab.daily {
   display: flex;
@@ -34,6 +35,7 @@
 }
 
 #release:checked ~ aside nav .tabs-nav .release label,
+#esr:checked ~ aside nav .tabs-nav .esr label,
 #beta:checked ~ aside nav .tabs-nav .beta label,
 #daily:checked ~ aside nav .tabs-nav .daily label {
   &:extend(.bg-blue, .text-white);
